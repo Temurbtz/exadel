@@ -8,5 +8,3 @@ class File(object):
 
 
 
-with File('demo.txt', 'w') as opened_file:
-    opened_file.write('Hola!')
