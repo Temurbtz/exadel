@@ -37,7 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'cleaning_companies',
+    'cleaning_company',
     'service_type',
     'request',
    'rating_review',
