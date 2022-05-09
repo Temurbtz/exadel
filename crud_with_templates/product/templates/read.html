@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>Products</h1>
+<ul>
+{% for product in object_list %}
+    <li>{{ product.title }} - {{ product.description }}-{{product.price}}  
+        <a href="{% url 'delete' pk=product.id %}">delete</a> 
+
+        <a href="{% url 'update' pk=product.id %}">update </a> 
+    </li>
+    
+{% empty %}
+    <li>No articles yet.</li>
+{% endfor %}
+
+<a   href="/create">Create</a>
+</ul>
+</body>
+</html>
