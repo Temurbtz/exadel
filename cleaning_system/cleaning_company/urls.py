@@ -1,8 +1,7 @@
 
 from django.urls import path,  include
-from .views  import  company_list,  company_detail
-
+from  .views  import  CompanyViewSet
 urlpatterns = [
-    path('company/', company_list),
-   path('company/<int:pk>/',company_detail ),
+   path('company/', CompanyViewSet.as_view({'get': 'list','post':'create'})),
+   path('company/<int:pk>/',CompanyViewSet.as_view({'get':'retrieve','put':'update','delete':'destroy'}))
 ]

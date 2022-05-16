@@ -1,48 +1,52 @@
 
-from .models  import Company
-from .serializers  import CompanySerializer
-from rest_framework.decorators import api_view
-from django.views.decorators.csrf import csrf_exempt
-from rest_framework.parsers import JSONParser
+from django.http import JsonResponse
+from django.http import Http404
+from  .serializers import  CompanySerializer, CompanyCreateSerializer
+from  .models  import Company
+from rest_framework import viewsets
 from rest_framework.response import Response
-from django.http import  JsonResponse
+from rest_framework.parsers import JSONParser
 from rest_framework import status
-@api_view(['GET', 'POST'])
-def company_list(request):
-    if request.method == 'GET':
-        companies = Company.objects.all()
+
+
+class CompanyViewSet(viewsets.ViewSet):
+    def get_object(self, pk):
+        try:
+            return Company.objects.get(pk=pk)
+        except Company.DoesNotExist:
+            raise Http404
+    def list(self, request):
+        companies=Company.objects.all()
         serializer = CompanySerializer(companies, many=True)
         return JsonResponse(serializer.data, safe=False)
 
-    elif request.method == 'POST':
-        print(request)
-        data = JSONParser().parse(request)
-        serializer = CompanySerializer(data=data)
-        if serializer.is_valid():
-            serializer.save()
-            return JsonResponse(serializer.data, status=201)
-        return JsonResponse(serializer.errors, status=400)
-  
+    def create(self, request):
+        data=JSONParser().parse(request)
+        postserializer=CompanyCreateSerializer(data=data)
+        if  postserializer.is_valid():
+            company=postserializer.save()
+            getserializer=CompanySerializer(company)
+            return JsonResponse(getserializer.data, status=201)
+        return JsonResponse(postserializer.errors, status=400)
 
-
-@api_view(['GET', 'PUT', 'DELETE'])
-def company_detail(request, pk):
-    try:
-        company = Company.objects.get(pk=pk)
-    except Company.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
-
-    if request.method == 'GET':
-        serializer = CompanySerializer(company)
+    def retrieve(self, request, pk=None):
+        company=self.get_object(pk)
+        serializer=CompanySerializer(company)
         return Response(serializer.data)
 
-    elif request.method == 'PUT':
-        serializer = CompanySerializer(company, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def update(self, request, pk=None):
+        company=self.get_object(pk)
+        updateserializer = CompanyCreateSerializer(company, data=request.data)
+        if  updateserializer.is_valid():
+            company=updateserializer.save()
+            getserializer=CompanySerializer(company)
+            return JsonResponse(getserializer.data, status=201)
+        return JsonResponse(updateserializer.errors, status=400)
 
-    elif request.method == 'DELETE':
+    def destroy(self, request, pk=None):
+        company=self.get_object(pk)
         company.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+
