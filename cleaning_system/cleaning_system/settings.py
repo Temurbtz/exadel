@@ -44,6 +44,9 @@ INSTALLED_APPS = [
     'request',
    'rating_review',
    'notifications',
+   'product',
+   'car',
+  
   
 ]
 
