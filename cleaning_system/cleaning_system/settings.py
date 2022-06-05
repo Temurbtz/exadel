@@ -38,7 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-     'debug_toolbar',
+    'car',
      'rest_framework',
       'djoser',
     'cleaning_company',
@@ -51,7 +51,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-     "debug_toolbar.middleware.DebugToolbarMiddleware",
+    
 
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -85,7 +85,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'cleaning_system.wsgi.application'
-
+CELERY_BROKER_URL='redis://localhost:6379'
 
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
