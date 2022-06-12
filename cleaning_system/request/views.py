@@ -1,48 +1,54 @@
-from django.http import Http404
-from rest_framework.views import APIView
+
+
+from rest_framework import viewsets
 from rest_framework.response import Response
+from rest_framework.parsers import JSONParser
 from rest_framework import status
+from django.http import JsonResponse
+from django.http import Http404
 
-
-from  .models  import Request
-from .serializers   import RequestSerializer
-
-
-class RequestList(APIView):
-    def get(self, request, format=None):
-        requestt = Request.objects.all()
-        serializer = RequestSerializer(requestt, many=True)
-        return Response(serializer.data)
-
-    def post(self, request, format=None):
-        serializer = RequestSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-class RequestDetail(APIView):
+from   .serializers  import RequestSerializer
+from  .models  import  Request
+class RequestViewSet(viewsets.ViewSet):
     def get_object(self, pk):
         try:
             return Request.objects.get(pk=pk)
         except Request.DoesNotExist:
             raise Http404
-
-    def get(self, request, pk, format=None):
-        requestt = self.get_object(pk)
-        serializer = RequestSerializer(requestt)
-        return Response(serializer.data)
-
-    def put(self, request, pk, format=None):
-        requestt= self.get_object(pk)
-        serializer = RequestSerializer(requestt, data=request.data)
-        if serializer.is_valid():
+    def create(self, request, **kwargs):
+        data=JSONParser().parse(request)
+        serializer=RequestSerializer(data=data, context={'company_id': self.kwargs['company_id'],'service_id':self.kwargs['service_id'],'user':request.user})
+        if  serializer.is_valid():
             serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return JsonResponse(serializer.data, status=201)
+        return JsonResponse(serializer.errors, status=400)
 
-    def delete(self, request, pk, format=None):
-        requestt = self.get_object(pk)
-        requestt.delete()
+    def list(self, request):
+        data=request.user.request_set
+        serializer = RequestSerializer(data, many=True)
+        return JsonResponse(serializer.data, safe=False)
+
+
+    def destroy(self, request, request_id=None):
+        data=self.get_object(request_id)
+        data.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+    def update(self, request, request_id=None):
+        request_object=self.get_object(request_id)
+        serializer = RequestSerializer(request_object,request.data)
+        if  serializer.is_valid():
+            serializer.save()
+            return JsonResponse(serializer.data, status=201)
+        return JsonResponse(serializer.errors, status=400)
+
+
+    
+
+    
+
+    
+
+
+    
+

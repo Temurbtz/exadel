@@ -11,22 +11,18 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('company', '0001_initial'),
-        ('service', '0001_initial'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Request',
+            name='Comment',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('location', models.TextField()),
-                ('measurement_unit_count', models.FloatField()),
-                ('total_cost', models.FloatField()),
+                ('text', models.TextField()),
                 ('date', models.DateTimeField(auto_now=True)),
-                ('company', models.ForeignKey(editable=False, on_delete=django.db.models.deletion.CASCADE, to='company.company')),
-                ('service', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='service.service')),
-                ('user', models.ForeignKey(editable=False, on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                ('company', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='company.company')),
+                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
             ],
         ),
     ]

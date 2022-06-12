@@ -1,12 +1,15 @@
 from django.db import models
-from django.contrib.auth.models import User
-from  cleaning_company.models import  Company
-from service_type.models  import Service
-class  Request(models.Model):
-    user=models.ForeignKey(User, on_delete=models.CASCADE,default=1)
-    company=models.ForeignKey(Company,on_delete=models.CASCADE)
-    cleaning_type=models.ForeignKey(Service, on_delete=models.CASCADE)
-    location=models.CharField(max_length=255)
-    area=models.DecimalField(decimal_places=2,max_digits=6)
-    hours=models.IntegerField()
-    price=models.DecimalField(decimal_places=2,max_digits=6)
+from  company.models import Company
+from  service.models  import Service
+from  django.contrib.auth import get_user_model
+User=get_user_model()
+
+class Request(models.Model):
+    user=models.ForeignKey(User,on_delete=models.CASCADE, editable=False)
+    company=models.ForeignKey(Company,on_delete=models.CASCADE,  editable=False)
+    service=models.ForeignKey(Service,on_delete=models.CASCADE)
+    location=models.TextField()
+    measurement_unit_count=models.FloatField()
+    total_cost=models.FloatField()
+    date=models.DateTimeField(auto_now=True)
+

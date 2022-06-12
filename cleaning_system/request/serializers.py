@@ -1,38 +1,28 @@
 from rest_framework import serializers
-from cleaning_company.models import Company
-from   service_type.models  import Service
-from .models  import Request
-class RequestSerializer(serializers.Serializer):
-    id = serializers.IntegerField(read_only=True)
-    company = serializers.PrimaryKeyRelatedField(queryset=Company.objects.all(),many=False)
-    cleaning_type=serializers.PrimaryKeyRelatedField(queryset=Service.objects.all(), many=False)
-    location=serializers.CharField(max_length=255)
-    area=serializers.DecimalField(decimal_places=2,max_digits=6)
-    hours=serializers.IntegerField()
-    price=serializers.DecimalField(decimal_places=2,max_digits=6)
 
-    
+from  .models  import Request
+from  company.models  import Company
+from  service.models  import Service
+from django.http import Http404
+class  RequestSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Request
+        fields = ['id','location','measurement_unit_count','total_cost']
 
     def create(self, validated_data):
-        request=Request()
-        request.company=validated_data.get('company')
-        request.cleaning_type=validated_data.get('cleaning_type')
-        request.location=validated_data.get('location')
-        request.area=validated_data.get('area')
-        request.hours=validated_data.get('hours')
-        request.price=validated_data.get('price')
-        request.save()
-        return request
+        company=self.get_company(self.context.get("company_id"))
+        service=self.get_service(self.context.get('service_id'))
+        user=self.context.get('user')
+        return  Request.objects.create(**validated_data, company=company, user=user, service=service)
 
-    def update(self, instance, validated_data):
-        instance.company=validated_data.get('company',instance.company)
-        instance.cleaning_type=validated_data.get('cleaning_data',instance.cleaning_type)
-        instance.location=validated_data.get('location',instance.location)
-        instance.area=validated_data.get('area',instance.area)
-        instance.hours=validated_data.get('hours',instance.hours)
-        instance.price=validated_data.get('price',instance.price)
-        return instance
+    def get_company(self,company_id):
+        try:
+           return Company.objects.get(pk=company_id)
+        except Company.DoesNotExist:
+            raise Http404
 
- 
-
- 
+    def get_service(self,service_id):
+        try:
+           return Service.objects.get(pk=service_id)
+        except Service.DoesNotExist:
+            raise Http404

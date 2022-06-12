@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
 from pathlib import Path
-
+from  datetime  import  timedelta
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -27,31 +27,34 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
+AUTH_USER_MODEL = 'account.User'
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
+   'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
-     'debug_toolbar',
+     'drf_yasg',
+     'channels',
      'rest_framework',
       'djoser',
-    'cleaning_company',
-    'service_type',
-    'request',
-   'rating_review',
-   'notifications',
-    'drf_yasg',
+      'rest_framework_simplejwt',
    
+   'account',
+   'company',
+   'service',
+   'request',
+   'comment',
+   'notification',
+   'search',
+  
 ]
 
 MIDDLEWARE = [
-     "debug_toolbar.middleware.DebugToolbarMiddleware",
+     
 
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -85,8 +88,8 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'cleaning_system.wsgi.application'
-
-
+ASGI_APPLICATION = 'cleaning_system.asgi.application'
+CELERY_BROKER_URL='redis://localhost:6379'
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
@@ -96,14 +99,13 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-SWAGGER_SETTINGS = {
-    'SECURITY_DEFINITIONS': {
-        "Auth Token eg [Bearer (JWT) ]": {
-            "type": "apiKey",
-            "name": "Authorization",
-            "in": "header"
-        }
-    }
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('127.0.0.1', 6379)],
+        },
+    },
 }
 
 # Password validation
@@ -147,20 +149,29 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+SIMPLE_JWT = {
+   'AUTH_HEADER_TYPES': ('JWT',),
+   'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
+   'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+   'AUTH_TOKEN_CLASSES': (
+       'rest_framework_simplejwt.tokens.AccessToken',
+   ),
+   
+}
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
         
     ),
-}
-SIMPLE_JWT = {
-   'AUTH_HEADER_TYPES': ('JWT',),
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated', # new
+    ]
+    
 }
 
-INTERNAL_IPS = [
-    '127.0.0.1',
-]
+
+
 STATIC_URL = "static/"
 
 
